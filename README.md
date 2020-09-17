@@ -5,6 +5,7 @@
 - nginx
 - php7.3
 - laravel
+- MySQL
 
 ## Setup
 
