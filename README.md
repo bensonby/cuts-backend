@@ -20,6 +20,7 @@ cd laradock
 cp env-example .env
 
 # ensure nothing is using ports 3306 for mysql and 80 for nginx
+# beware of port setting if it is changed, e.g. internally config should use 3306 for connecting to mysql container even if it exposed 3307
 docker-compose up -d nginx mysql
 
 # run composer install within container
