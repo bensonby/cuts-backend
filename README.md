@@ -30,3 +30,10 @@ composer install # should be in /var/www folder with composer.json
 
 # verify it works by going to http://localhost (should show Laravel page)
 ```
+
+## Database Migration
+
+```
+# initial setup
+docker-compose exec workspace php artisan migrate:fresh
+```
