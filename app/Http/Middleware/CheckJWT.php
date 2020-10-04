@@ -35,6 +35,9 @@ class CheckJWT
         $auth0 = \App::make('auth0');
 
         $accessToken = $request->bearerToken();
+        if (!$accessToken) {
+            return response()->json(["message" => "Unauthorized"], 401);
+        }
         try {
             $tokenInfo = $auth0->decodeJWT($accessToken);
             $user = $this->userRepository->getUserByDecodedJWT($tokenInfo);
