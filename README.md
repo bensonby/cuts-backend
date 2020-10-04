@@ -37,3 +37,10 @@ composer install # should be in /var/www folder with composer.json
 # initial setup
 docker-compose exec workspace php artisan migrate:fresh
 ```
+
+## Deployment
+
+In laradock folder, in `.env` set `WORKSPACE_INSTALL_DEPLOYER` to `true`.
+Run `docker-compose build workspace` if necessary to reflect changes
+
+Note: all environment variables should also be added to the `laradock/.env`, e.g. `DB_xxx`, `AUTH0_xxx`. These should be added in `docker-compose.yml` as environment variable for `workspace`, in order to be able for `workspace` container to have theses environment variables defined properly.
