@@ -23,6 +23,15 @@ Route::get('/public', function (Request $request) {
   return response()->json(["message" => "Hello public"]);
 });
 
-Route::get('/private', function (Request $request) {
-  return response()->json(["message" => "Hello private"]);
-})->middleware('jwt');
+Route::middleware('jwt')->group(function () {
+  Route::get('/private', function (Request $request) {
+    return response()->json(["message" => "Hello private"]);
+  });
+
+  Route::post('/app_get_timetable.php', function (Request $request) {
+    return response()->json([
+      "data" => [],
+      "course_profile" => [],
+    ]);
+  });
+});
