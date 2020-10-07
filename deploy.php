@@ -19,6 +19,7 @@ add('shared_files', [
   '.env',
   'laradock/.env',
   'laradock/docker-compose.yml', // to add working_dir for workspace, and volume mount for storage to prevent issue on symlink with docker
+  // 'laradock/nginx/sites/default.conf', // symlink not working for sharing this file into nginx container; use copy instead
 ]);
 set('shared_dirs', []); // override laravel config; since with docker we don't need symlink for shared_dirs, but will rely on docker-compose mounting
 
@@ -90,6 +91,10 @@ task('deploy:vendors', function () {
     run('{{bin/composer}} install');
 });
 
+task('copy:nginx_conf', function () {
+    run('cp {{deploy_path}}/shared/laradock/nginx/sites/default.conf {{release_path}}/{{laradock_path}}/nginx/sites/');
+});
+
 // [Optional] if deploy fails automatically unlock.
 after('deploy:failed', 'deploy:unlock');
 
@@ -114,6 +119,7 @@ task('deploy', [
     'deploy:release',
     'deploy:update_code',
     'deploy:shared',
+    'copy:nginx_conf',
     'docker:rebuild',
     // 'deploy:symlink', // do not use it since symlink not supported by docker
     'deploy:vendors',

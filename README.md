@@ -44,3 +44,15 @@ In laradock folder, in `.env` set `WORKSPACE_INSTALL_DEPLOYER` to `true`.
 Run `docker-compose build workspace` if necessary to reflect changes
 
 Note: all environment variables should also be added to the `laradock/.env`, e.g. `DB_xxx`, `AUTH0_xxx`. These should be added in `docker-compose.yml` as environment variable for `workspace`, in order to be able for `workspace` container to have theses environment variables defined properly.
+
+## Certbot cert installation
+
+- Modify the `environment` of `certbot` section in `docker-compose.yml`
+- Do not use `"` for safety unless strictly necessary
+- Add volume mounting for nginx for acme-challenge folder (referring to setup in nginx default.conf)
+- Add `/etc/letsencrypt` volume mounting for `certbot` container
+- run `docker-compose up -d certbot`
+
+## Nginx config
+
+- Create custom nginx config at `laradock/nginx/sites/default.conf`
