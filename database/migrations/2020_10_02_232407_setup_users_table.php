@@ -15,6 +15,7 @@ class SetupUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('sub')->unique(); // auth0 user id
+            $table->dropUnique('users_email_unique');
             $table->dropColumn('email_verified_at');
             $table->dropColumn('password');
         });
@@ -31,6 +32,7 @@ class SetupUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->unique('email');
             $table->dropColumn('sub');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
