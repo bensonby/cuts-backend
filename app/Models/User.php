@@ -35,4 +35,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [];
+
+    public function timetables() {
+      return $this->hasMany('App\Models\Timetable');
+    }
 }
