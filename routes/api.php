@@ -5,6 +5,13 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CourseController;
+use Illuminate\Support\Facades\DB;
+use App\Models\Course;
+use App\Models\UserCourse;
+use App\Models\Professor;
+use App\Models\Period;
+use App\Models\UserPeriod;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +29,69 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/public', function (Request $request) {
+  DB::transaction(function () {
+    $course = Course::create([
+      "year" => 2020,
+      "term" => 1,
+      "coursecode" => "FINA2220A",
+      "coursegroup" => "FINA2220",
+      "unit" => 3,
+      "coursename" => "fin",
+      "coursenamec" => "andrew blah",
+      "quota" => 50,
+    ]);
+    $course->professors()->create([
+      "name" => "Andrew NG",
+    ]);
+    $course->periods()->createMany([
+      [
+        "day" => "T",
+        "start" => 3,
+        "end" => 4,
+        "venue" => "ELB 306",
+        "type" => "LEC",
+        "lang" => "E",
+        "quota" => 50,
+      ],
+      [
+        "day" => "H",
+        "start" => 9,
+        "end" => 10,
+        "venue" => "ELB 307",
+        "type" => "LEC",
+        "lang" => "E",
+        "quota" => 50,
+      ],
+    ]);
+    $user = User::create([
+      "name" => "test1",
+      "email" => "test1@cuts.hk",
+      "sub" => "auth0|abcdefg3",
+    ]);
+    $timetable = $user->timetables()->create([
+      "year" => 2020,
+      "term" => 1,
+      "unit" => 12,
+      "score" => 80,
+    ]);
+    $user_course = new UserCourse;
+    $user_course->color = "#07ae35";
+    $user_course->course()->associate($course);
+    $user_course->timetable()->associate($timetable);
+    $user_course->save();
+    $user_period = new UserPeriod;
+    $user_period->necessity = true;
+    $user_period->user_course()->associate($user_course);
+    $user_period->period()->associate($course->periods[0]);
+    $user_period->save();
+    $user_period->custom_period()->create([
+      "day" => "F",
+      "start" => 11,
+      "end" => 11,
+      "venue" => "CCCC",
+    ]);
+  });
+
   return response()->json(["message" => "Hello public"]);
 });
 
