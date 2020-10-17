@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,10 +29,8 @@ Route::middleware('jwt')->group(function () {
     return response()->json(["message" => "Hello private"]);
   });
 
-  Route::post('/app_get_timetable.php', function (Request $request) {
-    return response()->json([
-      "data" => [],
-      "course_profile" => [],
-    ]);
-  });
+  Route::post(
+    '/app_get_timetable.php',
+    [UserController::class, 'getTimetables']
+  );
 });

@@ -6,6 +6,7 @@ use Auth0\Login\Contract\Auth0UserRepository;
 use Auth0\SDK\Exception\CoreException;
 use Auth0\SDK\Exception\InvalidTokenException;
 
+use Illuminate\Support\Facades\Auth;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -44,6 +45,7 @@ class CheckJWT
             if (!$user) {
                 return response()->json(["message" => "Unauthorized user"], 401);
             }
+            Auth::loginUsingId($user->id);
 
         } catch (InvalidTokenException $e) {
             return response()->json(["message" => $e->getMessage()], 401);
