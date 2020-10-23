@@ -126,7 +126,7 @@ task('deploy', [
     // 'artisan2:storage:link', // do not use it since symlink not supported by docker
     // 'artisan2:view:cache',
     'artisan2:config:cache',
-    // 'artisan2:route:cache',
+    'artisan2:route:cache',
     // 'artisan2:migrate:fresh', // first time run only
     'artisan2:migrate',
     'deploy:unlock',
