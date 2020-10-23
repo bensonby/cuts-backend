@@ -32,5 +32,5 @@ Route::middleware('jwt')->group(function () {
   Route::post(
     '/app_get_timetable.php',
     [UserController::class, 'getTimetables']
-  )->middleware('version.check:5.0.0,2.0.0');
+  )->middleware('version.check:5.0.0-pre,2.0.0-pre');
 });
