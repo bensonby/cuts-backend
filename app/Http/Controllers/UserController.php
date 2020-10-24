@@ -12,7 +12,7 @@ class UserController extends Controller
     $user = Auth::user();
     $timetables = $user->timetables()->with([
       'user_courses.user_periods',
-      'user_courses.course',
+      'user_courses.course.professors',
       'user_courses.user_periods.period',
       'user_courses.user_periods.custom_period',
     ])->get();
