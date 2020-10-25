@@ -44,3 +44,8 @@ Route::get(
   'coursecodes/{year}/{term}',
   [CourseController::class, 'getCoursecodes']
 )->middleware('version.check:5.0.0-dev,2.0.0-dev');
+
+Route::get(
+  'courses/{year}/{term}/{coursecode}',
+  [CourseController::class, 'getCourses']
+)->middleware('version.check:5.0.0-dev,2.0.0-dev');

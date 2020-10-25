@@ -8,6 +8,21 @@ use App\Models\Course;
 
 class CourseController extends Controller
 {
+  public function getCourses($year, $term, $coursecode) {
+    preg_match('/^[A-Za-z0-9]+/', $coursecode, $matches);
+    if (count($matches) != 1 || strlen($matches[0]) < 3) {
+      return response()->json(['message' => 'Bad Request'], 400);
+    }
+    $courses = Course::where('year', $year)
+      ->where('term', $term)
+      ->where('coursecode', 'like', $matches[0] . '%')
+      ->with([
+        'periods',
+        'professors',
+      ])->get();
+    return response()->json($courses);
+  }
+
   public function getCoursecodes($year, $term) {
     $coursegroups = Course::where('year', $year)
       ->where('term', $term)
