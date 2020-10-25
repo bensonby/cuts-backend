@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +35,12 @@ Route::middleware('jwt')->group(function () {
     [UserController::class, 'getTimetables']
   )->middleware('version.check:5.0.0-dev,2.0.0-dev');
 });
+
+Route::get('app_coursecode_list.php', function (Request $request) {
+  return response()->json(["message" => "Please update your App"], 400);
+});
+
+Route::get(
+  'coursecodes/{year}/{term}',
+  [CourseController::class, 'getCoursecodes']
+)->middleware('version.check:5.0.0-dev,2.0.0-dev');
