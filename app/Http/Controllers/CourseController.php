@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+
+define('RESULT_LIMIT', 600);
 
 class CourseController extends Controller
 {
@@ -67,6 +70,62 @@ class CourseController extends Controller
       $result[$first_char][$subject][] = $code;
     }
     return response()->json($result);
+  }
+
+  public function getByAdvanced(Request $request) {
+    $yearFrom = $request->input('yearFrom');
+    $yearTo = $request->input('yearTo');
+    $terms = $request->input('terms');
+    $coursecode = $request->input('coursecode');
+    $coursename = $request->input('coursename');
+    $professor = $request->input('professor');
+    $days = $request->input('days');
+    $periodFrom = $request->input('periodFrom');
+    $periodTo = $request->input('periodTo');
+
+    $query = Course::where('year', '>=', $yearFrom)
+      ->where('year', '<=', $yearTo)
+      ->whereIn('term', $terms);
+    if ($coursecode) {
+      $query = $query->where('coursecode', 'like', $coursecode . '%');
+    }
+    if ($coursename) {
+      $query = $query->where(function ($query) use ($coursename) {
+        $query->orwhere('coursename', 'like', '%' . $coursename . '%')
+          ->orwhere('coursenamec', 'like', '%' . $coursename . '%');
+      });
+    }
+    if ($professor) {
+      $query = $query->whereHas('professors', function (Builder $q) use ($professor) {
+        $q->where('name', 'like', '%' . $professor . '%');
+      });
+    }
+    if ($days && count($days) < 6) {
+      $query = $query->whereHas('periods', function (Builder $q) use ($days) {
+        $q->whereIn('day', $days);
+      });
+    }
+    if ($periodFrom && $periodTo) {
+      if ($periodFrom > 1 || $periodTo < config('constants.period.max_period')) {
+        $query = $query->whereHas('periods', function (Builder $q) use ($periodFrom, $periodTo) {
+          $q->where('start', '<=', $periodTo)->where('end', '>=', $periodFrom);
+        });
+      }
+    }
+    $courses = $query->with([
+      'periods',
+      'professors',
+    ])->get();
+    if (count($courses) > RESULT_LIMIT) {
+      return response()->json([
+        'courses' => [],
+        'message' => 'Too many results found. Please narrow down your criteria.',
+      ], 400);
+    }
+    return response()->json([
+      'courses' => $courses,
+      'message' => '',
+    ]);
   }
 
   public function getSuggestions(Request $request, $year, $term) {
