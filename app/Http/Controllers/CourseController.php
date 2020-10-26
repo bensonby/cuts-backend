@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
@@ -16,6 +17,25 @@ class CourseController extends Controller
     $courses = Course::where('year', $year)
       ->where('term', $term)
       ->where('coursecode', 'like', $matches[0] . '%')
+      ->with([
+        'periods',
+        'professors',
+      ])->get();
+    return response()->json($courses);
+  }
+
+  public function getByCoursegroups(Request $request, $year, $term) {
+    $coursegroups = $request->input('coursegroups');
+    if (count($coursegroups) == 0) {
+      return response()->json([]);
+    }
+    $courses = Course::where('year', $year)
+      ->where('term', $term)
+      ->where(function ($query) use ($coursegroups) {
+        foreach($coursegroups as $c) {
+          $query->orwhere('coursecode', 'like', $c . '%');
+        }
+      })
       ->with([
         'periods',
         'professors',
