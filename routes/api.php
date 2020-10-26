@@ -34,6 +34,11 @@ Route::middleware('jwt')->group(function () {
     '/app_get_timetable.php',
     [UserController::class, 'getTimetables']
   )->middleware('version.check:5.0.0-dev,2.0.0-dev');
+
+  Route::post(
+    'suggestions/{year}/{term}',
+    [CourseController::class, 'getSuggestions']
+  )->middleware('version.check:5.0.0-dev,2.0.0-dev');
 });
 
 Route::get('app_coursecode_list.php', function (Request $request) {

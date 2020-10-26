@@ -68,4 +68,9 @@ class CourseController extends Controller
     }
     return response()->json($result);
   }
+
+  public function getSuggestions(Request $request, $year, $term) {
+    $current_coursegroups = $request->input('coursegroups');
+    return response()->json(['message' => 'TODO'], 400);
+  }
 }
