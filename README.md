@@ -45,6 +45,11 @@ Run `docker-compose build workspace` if necessary to reflect changes
 
 Note: all environment variables should also be added to the `laradock/.env`, e.g. `DB_xxx`, `AUTH0_xxx`. These should be added in `docker-compose.yml` as environment variable for `workspace`, in order to be able for `workspace` container to have theses environment variables defined properly.
 
+## Updating course information
+
+- Put the file `YYYY_yyyymmdd_hhmm.txt` in `storage/app/data/` folder
+- Execute `docker-compose exec workspace php artisan update:courses /var/www/storage/app/data/YYYY_yyyymmdd_hhmm.txt`
+
 ## Certbot cert installation
 
 - Modify the `environment` of `certbot` section in `docker-compose.yml`

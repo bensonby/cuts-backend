@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Course;
+use App\Models\Professor;
+use App\Models\Period;
 
 class UpdateCourses extends Command
 {
@@ -51,19 +54,62 @@ class UpdateCourses extends Command
         $bar = $this->output->createProgressBar($course_count);
         $bar->start();
 
-        // skip header
+        $existingCourses = Course::where('year', $year)->get();
         if (($handle = fopen($filename, "r")) !== FALSE) {
-            $dummy = fgets($handle); // header
+            $dummy = fgets($handle); // skip header
             while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
-              $course = $this->buildCourseFromData($data);
+              $newCourse = $this->buildCourseFromData($data);
+              $this->handleCourseUpdate($year, $newCourse);
 
               $bar->advance();
             }
         }
 
         $bar->finish();
+        // TODO: remove deleted courses and periods
         $this->output->newLine();
         return 0;
+    }
+
+    private function handleCourseUpdate($year, $newCourse) {
+        $course = Course::updateOrCreate(
+          [
+            'coursecode' => $newCourse['coursecode'],
+            'year' => $year,
+            'term' => $newCourse['term'],
+          ],
+          [
+            'coursegroup' => substr($newCourse['coursecode'], 0, 8),
+            'unit' => $newCourse['unit'],
+            'coursename' => $newCourse['coursenameLong'],
+            'coursenamec' => $newCourse['coursenamec'],
+          ]
+        );
+        // TODO: check if period information is unique by type
+        foreach ($newCourse['periods'] as $period) {
+          $period = $course->periods()->updateOrCreate(
+            [
+              'type' => $period['type'],
+            ],
+            [
+              'quota' => $period['quota'],
+              'lang' => $period['lang'],
+              'venue' => $period['venue'],
+              'day' => $period['day'],
+              'start' => $period['start'],
+              'end' => $period['end'],
+            ],
+          );
+          // TODO: add to user's periods if new
+          // $period->wasRecentlyCreated
+        }
+        $professor_ids = array_map(function ($name) {
+          $professor = Professor::firstOrCreate(['name' => $name], []);
+          return $professor->id;
+        }, $newCourse['professors']);
+        $course->professors()->sync($professor_ids);
+        // TODO: check if updated by using the result from sync
+        // https://laravel.io/forum/05-20-2014-how-can-i-tell-if-a-many-to-many-sync-actually-changed-anything
     }
 
     private function buildCourseFromData($data) {
