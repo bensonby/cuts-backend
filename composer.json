@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.3",
         "auth0/login": "^6.1",
+        "doctrine/dbal": "^2.12",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
