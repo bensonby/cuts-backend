@@ -23,6 +23,10 @@ add('shared_files', [
 ]);
 set('shared_dirs', []); // override laravel config; since with docker we don't need symlink for shared_dirs, but will rely on docker-compose mounting
 
+set('copy_dirs', [
+  'storage/app/data', // timetable data files
+]);
+
 // For using docker
 set('bin/php', 'cd {{release_path}}/{{laradock_path}} && docker-compose exec --user=laradock -T workspace php');
 set('bin/composer', 'cd {{release_path}}/{{laradock_path}} && docker-compose exec --user=laradock -T workspace composer --working-dir=/var/www/');
@@ -119,6 +123,7 @@ task('deploy', [
     'deploy:release',
     'deploy:update_code',
     'deploy:shared',
+    'deploy:copy_dirs',
     'copy:nginx_conf',
     'docker:rebuild',
     // 'deploy:symlink', // do not use it since symlink not supported by docker
