@@ -36,9 +36,18 @@ Route::middleware('jwt')->group(function () {
   )->middleware('version.check:5.0.0-dev,2.0.0-dev');
 
   Route::post(
+    '/timetable/{year}/{term}',
+    [UserController::class, 'saveTimetable']
+  )->middleware('version.check:5.0.0-dev,2.0.0-dev');
+
+  Route::post(
     'suggestions/{year}/{term}',
     [CourseController::class, 'getSuggestions']
   )->middleware('version.check:5.0.0-dev,2.0.0-dev');
+});
+
+Route::get('ajax_save_timetable.php', function (Request $request) {
+  return response()->json(["message" => "Please update your App"], 400);
 });
 
 Route::get('app_coursecode_list.php', function (Request $request) {
