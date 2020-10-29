@@ -50,6 +50,7 @@ class UpdateCourses extends Command
         $course_count = count(file($filename)) - 1; // header
 
         // TODO: backup DB first
+        // TODO: also get undergrad
 
         $bar = $this->output->createProgressBar($course_count);
         $bar->start();
@@ -59,7 +60,19 @@ class UpdateCourses extends Command
             $dummy = fgets($handle); // skip header
             while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
               $newCourse = $this->buildCourseFromData($data);
-              $this->handleCourseUpdate($year, $newCourse);
+              if (!$newCourse) {
+                continue;
+              }
+              if (in_array($newCourse['term'], [1, 2])) {
+                $this->handleCourseUpdate($year, $newCourse);
+              } else {
+                $newCourse1 = $newCourse;
+                $newCourse2 = $newCourse;
+                $newCourse1['term'] = 1;
+                $newCourse2['term'] = 2;
+                $this->handleCourseUpdate($year, $newCourse1);
+                $this->handleCourseUpdate($year, $newCourse2);
+              }
 
               $bar->advance();
             }
@@ -125,6 +138,9 @@ class UpdateCourses extends Command
             'professorsStr',
         ];
         $record = array_combine($keys, $data);
+        if (strlen($record['coursecode']) < 2) {
+          return false;
+        }
         $record['term'] = intval($record['term']);
         $record['unit'] = intval($record['unit']);
         if (strlen($record['professorsStr']) <= 1) {
