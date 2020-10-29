@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use App\Models\Course;
 use App\Models\Professor;
 use App\Models\Period;
@@ -50,33 +51,32 @@ class UpdateCourses extends Command
         $course_count = count(file($filename)) - 1; // header
 
         // TODO: backup DB first
-        // TODO: also get undergrad
+        // TODO: also get postgrad
 
         $bar = $this->output->createProgressBar($course_count);
         $bar->start();
-
-        $existingCourses = Course::where('year', $year)->get();
-        if (($handle = fopen($filename, "r")) !== FALSE) {
-            $dummy = fgets($handle); // skip header
-            while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
-              $newCourse = $this->buildCourseFromData($data);
-              if (!$newCourse) {
-                continue;
+        DB::transaction(function () use ($filename, $year, $bar) {
+          if (($handle = fopen($filename, "r")) !== FALSE) {
+              $dummy = fgets($handle); // skip header
+              while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
+                $newCourse = $this->buildCourseFromData($data);
+                if (!$newCourse) {
+                  continue;
+                }
+                if (in_array($newCourse['term'], [1, 2])) {
+                  $this->handleCourseUpdate($year, $newCourse);
+                } else {
+                  $newCourse1 = $newCourse;
+                  $newCourse2 = $newCourse;
+                  $newCourse1['term'] = 1;
+                  $newCourse2['term'] = 2;
+                  $this->handleCourseUpdate($year, $newCourse1);
+                  $this->handleCourseUpdate($year, $newCourse2);
+                }
+                $bar->advance();
               }
-              if (in_array($newCourse['term'], [1, 2])) {
-                $this->handleCourseUpdate($year, $newCourse);
-              } else {
-                $newCourse1 = $newCourse;
-                $newCourse2 = $newCourse;
-                $newCourse1['term'] = 1;
-                $newCourse2['term'] = 2;
-                $this->handleCourseUpdate($year, $newCourse1);
-                $this->handleCourseUpdate($year, $newCourse2);
-              }
-
-              $bar->advance();
-            }
-        }
+          }
+        });
 
         $bar->finish();
         // TODO: remove deleted courses and periods
@@ -98,7 +98,6 @@ class UpdateCourses extends Command
             'coursenamec' => $newCourse['coursenamec'],
           ]
         );
-        // TODO: check if period information is unique by type
         foreach ($newCourse['periods'] as $period) {
           $period = $course->periods()->updateOrCreate(
             [
@@ -139,7 +138,7 @@ class UpdateCourses extends Command
         ];
         $record = array_combine($keys, $data);
         if (strlen($record['coursecode']) < 2) {
-          return false;
+          throw new \Exception('Coursecode is invalid: ' . $record['coursecode']);
         }
         $record['term'] = intval($record['term']);
         $record['unit'] = intval($record['unit']);
@@ -153,9 +152,7 @@ class UpdateCourses extends Command
         $record['periods'] = array_map(array($this, 'buildPeriodFromData'), explode('|', $record['periodsStr']));
         $types = array_map(function ($p) { return $p['type']; }, $record['periods']);
         if (hasDuplicates($types)) {
-          $this->output->newLine();
-          $this->error($record['coursecode'] . ' has multiple periods having the same type.');
-          return false;
+          throw new \Exception($record['coursecode'] . ' has multiple periods having the same type.');
         }
         return $record;
     }
