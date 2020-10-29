@@ -151,6 +151,12 @@ class UpdateCourses extends Command
         }
         $record['professors'] = explode('|', $record['professorsStr']);
         $record['periods'] = array_map(array($this, 'buildPeriodFromData'), explode('|', $record['periodsStr']));
+        $types = array_map(function ($p) { return $p['type']; }, $record['periods']);
+        if (hasDuplicates($types)) {
+          $this->output->newLine();
+          $this->error($record['coursecode'] . ' has multiple periods having the same type.');
+          return false;
+        }
         return $record;
     }
 
@@ -163,4 +169,10 @@ class UpdateCourses extends Command
         $record['end'] = intval($record['end']);
         return $record;
     }
+}
+
+function hasDuplicates($values) {
+  // Note: $values can only contain integer or string for this function to work
+  // otherwise use array_unique instead of array_flip
+  return count($values) !== count(array_flip($values));
 }
