@@ -28,7 +28,7 @@ class UserController extends Controller
 
   public function saveTimetable(Request $request, $year, $term) {
     $user = Auth::user();
-    DB::transaction(function () use ($request, $user, $year, $term) {
+    $timetable = DB::transaction(function () use ($request, $user, $year, $term) {
       $timetable = $user->timetables()->firstOrCreate(
         ['year' => $year, 'term' => $term],
         ['unit' => 0]
@@ -58,7 +58,14 @@ class UserController extends Controller
         // validate course's year and term = timetable year and term
       }
       // update timetable unit and score
+      return $timetable;
     });
-    return response()->json(['userCourses' => $userCourses, 'userPeriods' => $userPeriods]);
+    $timetable->load(
+      'user_courses.user_periods',
+      'user_courses.course.professors',
+      'user_courses.user_periods.period',
+      'user_courses.user_periods.custom_period',
+    );
+    return response()->json(['timetable' => $timetable]);
   }
 }
