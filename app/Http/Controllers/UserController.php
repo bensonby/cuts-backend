@@ -50,11 +50,17 @@ class UserController extends Controller
           $period = Period::find($up['period']['id']);
           $userPeriod->period()->associate($period);
           $userPeriod->save();
+          if ($up['customPeriod']) {
+            $userPeriod->custom_period()->create([
+              "day" => $up['customPeriod']['day'],
+              "start" => $up['customPeriod']['start'],
+              "end" => $up['customPeriod']['end'],
+              "venue" => $up['customPeriod']['venue'],
+            ]);
+          }
           $userPeriods[] = $userPeriod;
         }
         // TODO check if userPeriods complete against course.periods
-        // TODO custom_period
-        // delete if no userCourses
         // validate course's year and term = timetable year and term
       }
       // update timetable unit and score
