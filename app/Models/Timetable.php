@@ -30,8 +30,16 @@ class Timetable extends Model
       "score",
     ];
 
-    public function getUnit() {
-      return 3; // TODO
+    // TODO consider making this event to automatically update
+    public function calculateUnit() {
+      $this->unit = array_sum(
+        array_map(
+          function ($uc) {
+            return $uc->course->unit;
+          },
+          $this->user_courses->all(),
+        )
+      );
     }
 
     public function user() {

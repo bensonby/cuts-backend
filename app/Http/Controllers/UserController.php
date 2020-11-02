@@ -64,6 +64,8 @@ class UserController extends Controller
         // validate course's year and term = timetable year and term
       }
       // update timetable unit and score
+      $timetable->calculateUnit();
+      $timetable->save();
       return $timetable;
     });
     $timetable->load(
