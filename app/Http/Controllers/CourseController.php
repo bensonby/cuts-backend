@@ -112,16 +112,17 @@ class CourseController extends Controller
         });
       }
     }
-    $courses = $query->with([
-      'periods',
-      'professors',
-    ])->get();
-    if (count($courses) > RESULT_LIMIT) {
+    $count = $query->count();
+    if ($count > RESULT_LIMIT) {
       return response()->json([
         'courses' => [],
         'message' => 'Too many results found. Please narrow down your criteria.',
       ], 400);
     }
+    $courses = $query->with([
+      'periods',
+      'professors',
+    ])->get();
     return response()->json([
       'courses' => $courses,
       'message' => '',
