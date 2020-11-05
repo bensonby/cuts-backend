@@ -40,4 +40,8 @@ class Course extends Model
     public function periods() {
       return $this->hasMany('App\Models\Period');
     }
+
+    public function user_courses() {
+      return $this->hasMany('App\Models\UserCourse');
+    }
 }

@@ -33,6 +33,8 @@ class Period extends Model
       "remarks",
     ];
 
+    protected $touches = ['course'];
+
     public function course() {
       return $this->belongsTo('App\Models\Course');
     }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Course;
 use App\Models\Professor;
 use App\Models\Period;
+use App\Models\UserPeriod;
 
 class UpdateCourses extends Command
 {
@@ -55,7 +56,8 @@ class UpdateCourses extends Command
 
         $bar = $this->output->createProgressBar($course_count);
         $bar->start();
-        DB::transaction(function () use ($filename, $year, $bar) {
+        $coursecodes = [[], [], []];
+        DB::transaction(function () use ($filename, $year, $bar, $coursecodes) {
           if (($handle = fopen($filename, "r")) !== FALSE) {
               $dummy = fgets($handle); // skip header
               while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
@@ -65,6 +67,7 @@ class UpdateCourses extends Command
                 }
                 if (in_array($newCourse['term'], [1, 2])) {
                   $this->handleCourseUpdate($year, $newCourse);
+                  $coursecodes[$newCourse['term']][] = $newCourse['coursecode'];
                 } else {
                   $newCourse1 = $newCourse;
                   $newCourse2 = $newCourse;
@@ -72,9 +75,14 @@ class UpdateCourses extends Command
                   $newCourse2['term'] = 2;
                   $this->handleCourseUpdate($year, $newCourse1);
                   $this->handleCourseUpdate($year, $newCourse2);
+                  $coursecodes[1][] = $newCourse['coursecode'];
+                  $coursecodes[2][] = $newCourse['coursecode'];
                 }
                 $bar->advance();
               }
+              // check for deleted courses
+              $this->deleteCourses($coursecodes[1], $year, 1);
+              $this->deleteCourses($coursecodes[2], $year, 2);
           }
         });
 
@@ -85,6 +93,7 @@ class UpdateCourses extends Command
     }
 
     private function handleCourseUpdate($year, $newCourse) {
+        // Course update
         $course = Course::updateOrCreate(
           [
             'coursecode' => $newCourse['coursecode'],
@@ -98,6 +107,8 @@ class UpdateCourses extends Command
             'coursenamec' => $newCourse['coursenamec'],
           ]
         );
+        $course_changed = false;
+        // Period update
         foreach ($newCourse['periods'] as $period) {
           $period = $course->periods()->updateOrCreate(
             [
@@ -112,16 +123,48 @@ class UpdateCourses extends Command
               'end' => $period['end'],
             ],
           );
-          // TODO: add to user's periods if new
-          // $period->wasRecentlyCreated
+          if ($period->wasRecentlyCreated) {
+            foreach($course->user_courses as $uc) {
+              $userPeriod = new UserPeriod;
+              $userPeriod->necessity = true;
+              $userPeriod->user_course()->associate($uc);
+              $userPeriod->period()->associate($period);
+              $userPeriod->save();
+            }
+          }
         }
+        $current_period_types = array_map(
+          function ($p) { return $p['type']; },
+          $newCourse['periods']
+        );
+        $periods_deleted = false;
+        foreach($course->periods as $p) {
+          if (!in_array($p->type, $current_period_types)) {
+            $p->delete();
+            $periods_deleted = true;
+          }
+        }
+        if ($periods_deleted) {
+          $course_changed = true;
+        }
+        // Professor update
         $professor_ids = array_map(function ($name) {
           $professor = Professor::firstOrCreate(['name' => $name], []);
           return $professor->id;
         }, $newCourse['professors']);
-        $course->professors()->sync($professor_ids);
-        // TODO: check if updated by using the result from sync
-        // https://laravel.io/forum/05-20-2014-how-can-i-tell-if-a-many-to-many-sync-actually-changed-anything
+        $changed = $course->professors()->sync($professor_ids);
+        if (count($changed['attached']) > 0 || count($changed['detached'])
+          || count($changed['updated']) > 0) {
+          // professor changed
+          // https://laravel.io/forum/05-20-2014-how-can-i-tell-if-a-many-to-many-sync-actually-changed-anything
+          $course_changed = true;
+        }
+        if ($course_changed) {
+          foreach($course->user_courses as $uc) {
+            $uc->touch();
+          }
+          $course->touch();
+        }
     }
 
     private function buildCourseFromData($data) {
@@ -165,6 +208,29 @@ class UpdateCourses extends Command
         $record['start'] = intval($record['start']);
         $record['end'] = intval($record['end']);
         return $record;
+    }
+    private function deleteCourses($newCoursecodes, $year, $term) {
+      $existingCoursecodes = Course::where('year', $year)
+        ->where('term', $term)
+        ->pluck('coursecode')
+        ->toArray();
+      $deletedCourses = array_diff($existingCoursecodes, $newCoursecodes);
+      $courses = Course::where('year', $year)
+        ->where('term', $term)
+        ->whereIn('coursecode', $deletedCourses)
+        ->with('user_courses')
+        ->get();
+      foreach($courses as $c) {
+        foreach($c['user_courses'] as $uc) {
+          $timetable = $uc->timetable;
+          $timetable->unit = $timetable->unit - $c->unit;
+          $timetable->save();
+        }
+      }
+      Course::where('year', $year)
+        ->where('term', $term)
+        ->whereIn('coursecode', $deletedCourses)
+        ->delete();
     }
 }
 

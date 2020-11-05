@@ -23,6 +23,8 @@ class UserCourse extends Model
       "color",
     ];
 
+    protected $touches = ['timetable'];
+
     public function course() {
       return $this->belongsTo('App\Models\Course');
     }

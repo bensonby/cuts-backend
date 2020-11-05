@@ -22,6 +22,8 @@ class UserPeriod extends Model
       "necessity",
     ];
 
+    protected $touches = ['user_course'];
+
     public function user_course() {
       return $this->belongsTo('App\Models\UserCourse');
     }
