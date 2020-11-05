@@ -26,6 +26,44 @@ class UserController extends Controller
     return response()->json($timetables);
   }
 
+  public function saveTimetableByCoursecodes(Request $request, $year, $term) {
+    $user = User::find(135026);
+    $timetable = DB::transaction(function () use ($request, $user, $year, $term) {
+      $timetable = $user->timetables()->firstOrCreate(
+        ['year' => $year, 'term' => $term],
+        ['unit' => 0]
+      );
+      $timetable->user_courses()->delete();
+      foreach($request->input('coursecodes') as $coursecode) {
+        $course = Course::where('coursecode', $coursecode)->where('year', $year)->where('term', $term)->first();
+        $userCourse = new UserCourse;
+        $userCourse->color = '4899BE';
+        $userCourse->course()->associate($course);
+        $userCourse->timetable()->associate($timetable);
+        $userCourse->save();
+        $userCourses[] = $userCourse;
+        foreach($course->periods as $period) {
+          $userPeriod = new UserPeriod;
+          $userPeriod->necessity = true;
+          $userPeriod->user_course()->associate($userCourse);
+          $userPeriod->period()->associate($period);
+          $userPeriod->save();
+        }
+      }
+      $timetable->calculateUnit();
+      $timetable->touch();
+      $timetable->save();
+      return $timetable;
+    });
+    $timetable->load(
+      'user_courses.user_periods',
+      'user_courses.course.professors',
+      'user_courses.user_periods.period',
+      'user_courses.user_periods.custom_period',
+    );
+    return response()->json(['timetable' => $timetable]);
+  }
+
   public function saveTimetable(Request $request, $year, $term) {
     $user = Auth::user();
     $timetable = DB::transaction(function () use ($request, $user, $year, $term) {

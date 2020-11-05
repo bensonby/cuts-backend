@@ -73,3 +73,8 @@ Route::post(
   'courses',
   [CourseController::class, 'getByAdvanced']
 )->middleware('version.check:5.0.0-dev,2.0.0-dev');
+
+Route::post(
+  '/timetable2/{year}/{term}',
+  [UserController::class, 'saveTimetableByCoursecodes']
+);
