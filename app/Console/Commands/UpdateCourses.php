@@ -16,7 +16,8 @@ class UpdateCourses extends Command
      *
      * @var string
      */
-    protected $signature = 'update:courses {filename : YYYY_yyyymmdd_hhmm.txt}';
+    protected $signature = 'update:courses
+                           {filename : YYYY_yyyymmdd_hhmm.txt}';
 
     /**
      * The console command description.
@@ -49,47 +50,64 @@ class UpdateCourses extends Command
             return 1;
         }
         $year = $matches[1];
-        $course_count = count(file($filename)) - 1; // header
+        $pgCoursecodes = config('courses.pg_coursecodes');
 
         // TODO: backup DB first
-        // TODO: also get postgrad
-
-        $bar = $this->output->createProgressBar($course_count);
-        $bar->start();
-        $coursecodes = [[], [], []];
-        DB::transaction(function () use ($filename, $year, $bar, $coursecodes) {
-          if (($handle = fopen($filename, "r")) !== FALSE) {
-              $dummy = fgets($handle); // skip header
-              while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
-                $newCourse = $this->buildCourseFromData($data);
-                if (!$newCourse) {
-                  continue;
-                }
-                if (in_array($newCourse['term'], [1, 2])) {
-                  $this->handleCourseUpdate($year, $newCourse);
-                  $coursecodes[$newCourse['term']][] = $newCourse['coursecode'];
-                } else {
-                  $newCourse1 = $newCourse;
-                  $newCourse2 = $newCourse;
-                  $newCourse1['term'] = 1;
-                  $newCourse2['term'] = 2;
-                  $this->handleCourseUpdate($year, $newCourse1);
-                  $this->handleCourseUpdate($year, $newCourse2);
-                  $coursecodes[1][] = $newCourse['coursecode'];
-                  $coursecodes[2][] = $newCourse['coursecode'];
-                }
-                $bar->advance();
-              }
-              // check for deleted courses
-              $this->deleteCourses($coursecodes[1], $year, 1);
-              $this->deleteCourses($coursecodes[2], $year, 2);
+        DB::transaction(function () use ($filename, $year, $pgCoursecodes) {
+          $coursecodes = $this->processFile($filename, $year, $pgCoursecodes);
+          // check for deleted courses
+          foreach([1, 2] as $term) {
+            $this->deleteCourses(
+              $coursecodes[$term],
+              $year,
+              $term,
+            );
           }
         });
 
-        $bar->finish();
-        // TODO: remove deleted courses and periods
-        $this->output->newLine();
         return 0;
+    }
+
+    private function processFile($filename, $year, $pgCoursecodes) {
+      $coursecodes = [[], [], []]; // return list of coursecodes for deletion
+      $course_count = count(file($filename)) - 1; // header
+      $bar = $this->output->createProgressBar($course_count);
+      $bar->start();
+      if (($handle = fopen($filename, "r")) !== FALSE) {
+        $dummy = fgets($handle); // skip header
+        while (($data = fgetcsv($handle, 0, "\t", '"')) !== FALSE) {
+          $newCourse = $this->buildCourseFromData($data);
+          if (!$newCourse) {
+            continue;
+          }
+          // post grad courses handling
+          if(intval($newCourse['coursecode'][4]) >= 5) {
+            if (!in_array($newCourse['coursecode'], $pgCoursecodes)
+              && !in_array(substr($newCourse['coursecode'], 0, 5), $pgCoursecodes)
+            ) {
+              $bar->advance();
+              continue;
+            }
+          }
+          if (in_array($newCourse['term'], [1, 2])) {
+            $this->handleCourseUpdate($year, $newCourse);
+            $coursecodes[$newCourse['term']][] = $newCourse['coursecode'];
+          } else {
+            $newCourse1 = $newCourse;
+            $newCourse2 = $newCourse;
+            $newCourse1['term'] = 1;
+            $newCourse2['term'] = 2;
+            $this->handleCourseUpdate($year, $newCourse1);
+            $this->handleCourseUpdate($year, $newCourse2);
+            $coursecodes[1][] = $newCourse['coursecode'];
+            $coursecodes[2][] = $newCourse['coursecode'];
+          }
+          $bar->advance();
+        }
+      }
+      $bar->finish();
+      $this->output->newLine();
+      return $coursecodes;
     }
 
     private function handleCourseUpdate($year, $newCourse) {
