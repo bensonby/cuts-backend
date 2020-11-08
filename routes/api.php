@@ -51,7 +51,10 @@ Route::get('ajax_save_timetable.php', function (Request $request) {
 });
 
 Route::get('app_coursecode_list.php', function (Request $request) {
-  return response()->json(["message" => "Please update your App"], 400);
+  $year = intval($request->input('year'));
+  $term = intval($request->input('term'));
+  $controller = new CourseController;
+  return $controller->getCoursecodes($year, $term);
 });
 
 Route::get(
