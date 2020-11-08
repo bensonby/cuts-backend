@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\Timetable;
 
 define('RESULT_LIMIT', 600);
 
@@ -130,7 +132,47 @@ class CourseController extends Controller
   }
 
   public function getSuggestions(Request $request, $year, $term) {
-    $current_coursegroups = $request->input('coursegroups');
-    return response()->json(['message' => 'TODO'], 400);
+    $user = Auth::user();
+    $query = Timetable::where('user_id', $user->id)
+      ->where(function ($q) use ($year, $term) {
+        $q->where('year', '<>', $year)
+          ->orWhere('term', '<>', $term);
+      })
+      ->with('user_courses.course')
+      ->get();
+    $takenCoursegroups = $query->pluck('user_courses')->collapse()->pluck('course.coursegroup')->all();
+    $takenCoursegroups = array_filter($takenCoursegroups, function($c) {
+      return (substr($c, 0, 2) != 'GE' || substr($c, 0, 4) == 'GERM') && substr($c, 0, 2) != 'UG';
+    });
+    $currentTermCoursegroups = $request->input('coursegroups');
+    $coursegroups = array_merge($takenCoursegroups, $currentTermCoursegroups);
+    if(count($coursegroups) == 0) {
+      return response()->json(['message' => 'You do not have any courses taken. No suggestions are available.'], 400);
+    }
+    $res = Http::post(config('courses.ml.host') . 'predict', [
+      'coursegroups' => $coursegroups,
+      'num_chunks' => config('courses.ml.num_chunks'),
+      'api_key' => config('courses.ml.api_key'),
+      'threshold' => config('courses.ml.threshold'),
+    ]);
+    if (!$res->ok()) {
+      return response()->json(['message' => 'Request failed.'], 400);
+    }
+    $results = $res['results'];
+    $courses = Course::where('year', $year)
+      ->where('term', $term)
+      ->whereIn('coursegroup', $results)
+      ->with([
+        'periods',
+        'professors',
+      ])->get();
+    if (count($courses) == 0) {
+      return response()->json(['message' => 'No courses found.'], 400);
+    }
+    foreach($courses as $course) {
+      $relevance = array_search($course->coursegroup, $results);
+      $course['relevance'] = $relevance;
+    }
+    return response()->json($courses);
   }
 }
