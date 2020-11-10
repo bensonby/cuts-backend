@@ -61,3 +61,30 @@ Note: all environment variables should also be added to the `laradock/.env`, e.g
 ## Nginx config
 
 - Create custom nginx config at `laradock/nginx/sites/default.conf`
+
+## Database backup
+
+https://github.com/spatie/laravel-backup
+
+Fill in s3 variables in .env
+
+```
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=
+AWS_BUCKET=
+SLACK_WEBHOOK_URL=
+```
+
+Execute backup (once):
+
+```
+docker-compose exec workspace php artisan backup:run --only-db
+```
+
+## Changes made to docker-compose
+
+```
+Add database variables
+Set `WORKSPACE_INSTALL_MYSQL_CLIENT` to `true`
+```
