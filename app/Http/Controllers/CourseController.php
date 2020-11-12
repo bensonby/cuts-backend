@@ -29,6 +29,24 @@ class CourseController extends Controller
     return response()->json($courses);
   }
 
+  private function getByCoursecodes($coursecodes, $year, $term) {
+    if (count($coursecodes) == 0) {
+      return response()->json([]);
+    }
+    $courses = Course::where('year', $year)
+      ->where('term', $term)
+      ->where(function ($query) use ($coursecodes) {
+        foreach($coursecodes as $c) {
+          $query->orwhere('coursecode', 'like', $c . '%');
+        }
+      })
+      ->with([
+        'periods',
+        'professors',
+      ])->get();
+    return $courses;
+  }
+
   public function getByCoursegroups(Request $request, $year, $term) {
     $coursegroups = $request->input('coursegroups');
     if (count($coursegroups) == 0) {
@@ -75,16 +93,26 @@ class CourseController extends Controller
   }
 
   public function getByAdvanced(Request $request) {
-    $yearFrom = $request->input('yearFrom');
-    $yearTo = $request->input('yearTo');
-    $terms = $request->input('terms');
-    $coursecode = $request->input('coursecode');
-    $coursename = $request->input('coursename');
-    $professor = $request->input('professor');
-    $days = $request->input('days');
-    $periodFrom = $request->input('periodFrom');
-    $periodTo = $request->input('periodTo');
+    $params = [
+      'yearFrom' => $request->input('yearFrom'),
+      'yearTo' => $request->input('yearTo'),
+      'terms' => $request->input('terms'),
+      'coursecode' => $request->input('coursecode'),
+      'coursename' => $request->input('coursename'),
+      'professor' => $request->input('professor'),
+      'days' => $request->input('days'),
+      'periodFrom' => $request->input('periodFrom'),
+      'periodTo' => $request->input('periodTo'),
+    ];
+    $result = $this->_searchByAdvanced($params);
+    return response()->json([
+      'courses' => $result['courses'],
+      'message' => $result['message'],
+    ]);
+  }
 
+  private function _searchByAdvanced($params) {
+    extract($params);
     $query = Course::where('year', '>=', $yearFrom)
       ->where('year', '<=', $yearTo)
       ->whereIn('term', $terms);
@@ -116,19 +144,21 @@ class CourseController extends Controller
     }
     $count = $query->count();
     if ($count > RESULT_LIMIT) {
-      return response()->json([
+      return [
+        'count' => $count,
         'courses' => [],
         'message' => 'Too many results found. Please narrow down your criteria.',
-      ], 400);
+      ];
     }
     $courses = $query->with([
       'periods',
       'professors',
     ])->get();
-    return response()->json([
+    return [
+      'count' => $count,
       'courses' => $courses,
       'message' => '',
-    ]);
+    ];
   }
 
   public function getSuggestions(Request $request, $year, $term) {
@@ -174,5 +204,54 @@ class CourseController extends Controller
       $course['relevance'] = $relevance;
     }
     return response()->json($courses);
+  }
+
+  public function getCoursesWithOldApi(Request $request) {
+    $year = intval($request->input('year'));
+    $term = intval($request->input('term'));
+    $coursecodes = explode(',', $request->input('key'));
+    $courses = $this->getByCoursecodes($coursecodes, $year, $term);
+    return response()->json([
+      'courses' => CourseController::coursesToOldJson($courses),
+    ]);
+  }
+
+  public function getCoursesAdvancedWithOldApi(Request $request) {
+    $terms = [];
+    foreach([1, 2] as $term) {
+      if ($request->input("term{$term}") == 'true') {
+        $terms[] = $term;
+      }
+    }
+    $days = [];
+    foreach(['M', 'T', 'W', 'H', 'F', 'S'] as $day) {
+      if ($request->input("day{$day}") == 'true') {
+        $days[] = $day;
+      }
+    }
+
+    $params = [
+      'yearFrom' => intval($request->input('yearFrom')),
+      'yearTo' => intval($request->input('yearTo')),
+      'terms' => $terms,
+      'coursecode' => $request->input('coursecode'),
+      'coursename' => $request->input('coursename'),
+      'professor' => $request->input('professor'),
+      'days' => $days,
+      'periodFrom' => intval($request->input('periodFrom')),
+      'periodTo' => intval($request->input('periodTo')),
+    ];
+    $result = $this->_searchByAdvanced($params);
+    return response()->json([
+      'results' => CourseController::coursesToOldJson($result['courses']),
+      'error' => $result['message'],
+    ]);
+  }
+
+  static function coursesToOldJson($courses) {
+    if (!$courses) {
+      return [];
+    }
+    return $courses->map('App\Models\Course::toOldJson');
   }
 }

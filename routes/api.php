@@ -22,7 +22,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/app_meta_info.php', GetAppMeta::class);
 Route::get('meta', GetAppMeta::class);
 
 Route::middleware('jwt')->group(function () {
@@ -48,13 +47,6 @@ Route::middleware('jwt')->group(function () {
 
 Route::get('ajax_save_timetable.php', function (Request $request) {
   return response()->json(["message" => "Please update your App"], 400);
-});
-
-Route::get('app_coursecode_list.php', function (Request $request) {
-  $year = intval($request->input('year'));
-  $term = intval($request->input('term'));
-  $controller = new CourseController;
-  return $controller->getCoursecodes($year, $term);
 });
 
 Route::get(

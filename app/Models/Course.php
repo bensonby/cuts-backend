@@ -44,4 +44,21 @@ class Course extends Model
     public function user_courses() {
       return $this->hasMany('App\Models\UserCourse');
     }
+
+    static public function toOldJson($course) {
+      return [
+        'year' => $course->year,
+        'term' => $course->term,
+        'cid' => $course->id,
+        'coursecode' => $course->coursecode,
+        'coursename' => $course->coursename,
+        'coursenamec' => $course->coursenamec,
+        'coursegroup' => $course->coursegroup,
+        'periods' => $course->periods->map('App\Models\Period::toOldJson'),
+        'prof' => $course->professors->pluck('name')->all(),
+        'unit' => $course->unit,
+        'quota' => $course->quota,
+        'lang' => $course['periods'][0]['lang'],
+      ];
+    }
 }
