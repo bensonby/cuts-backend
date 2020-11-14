@@ -42,11 +42,14 @@ set('git_recursive', true);
 set('laradock_path', 'laradock');
 
 // Hosts
-// staging
 host('cuts-backend')
     ->set('branch', 'staging')
-    ->set('deploy_path', '~/{{application}}');    
-    
+    ->set('deploy_path', '~/{{application}}');
+
+host('cuts-prod')
+    ->set('branch', 'production')
+    ->set('deploy_path', '~/{{application}}');
+
 // Tasks
 
 task('build', function () {
