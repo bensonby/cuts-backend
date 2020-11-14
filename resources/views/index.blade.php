@@ -30,12 +30,14 @@
         <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
           <form>
             <div class="form-row">
+<!--
               <div class="col-12 col-md-6">
                 <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
                   <a href='https://apps.apple.com/us/app/cuts-cuhk-timetable-system/id1498369252?mt=8' class="align-middle" style="display: inline-block;"><img alt='Get it on App Store' src='img/ios-badge.png' class="align-middle" style="width: 209px; height: 62px;"/></a>
                 </div>
               </div>
-              <div class="col-12 col-md-6">
+-->
+              <div class="col-12 col-md-12">
                 <a href='https://play.google.com/store/apps/details?id=com.cuhkcuts&hl=en_US&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' style="width: 240px;"/></a>
               </div>
             </div>
