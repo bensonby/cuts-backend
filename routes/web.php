@@ -14,5 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
+});
+
+Route::get('/tos.html', function () {
+    return view('tos');
+});
+
+Route::get('/privacy-policy.html', function () {
+    return view('privacy');
 });
