@@ -91,11 +91,11 @@
             </li>
             <li class="list-inline-item">&sdot;</li>
             <li class="list-inline-item">
-              <a href="https://cuts.oursky.com/tos.html">Terms of Use</a>
+              <a href="/tos.html">Terms of Use</a>
             </li>
             <li class="list-inline-item">&sdot;</li>
             <li class="list-inline-item">
-              <a href="https://cuts.oursky.com/privacy-policy.html">Privacy Policy</a>
+              <a href="/privacy-policy.html">Privacy Policy</a>
             </li>
           </ul>
           <p class="text-muted small mb-4 mb-lg-0">&copy; CUTS 2020. All Rights Reserved.</p>
