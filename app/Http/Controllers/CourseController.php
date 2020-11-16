@@ -216,6 +216,31 @@ class CourseController extends Controller
     ]);
   }
 
+  public function getCoursesByPeriodWithOldApi(Request $request) {
+    $year = intval($request->input('year'));
+    $term = intval($request->input('term'));
+    $day = $request->input('day');
+    if (!in_array($day, ['M', 'T', 'W', 'H', 'F', 'S'])) {
+      return response()->json([ 'courses' => []]);
+    }
+    $period = intval($request->input('period'));
+    $params = [
+      'yearFrom' => $year,
+      'yearTo' => $year,
+      'terms' => [$term],
+      'coursecode' => null,
+      'coursename' => null,
+      'professor' => null,
+      'days' => [$day],
+      'periodFrom' => $period,
+      'periodTo' => $period,
+    ];
+    $result = $this->_searchByAdvanced($params);
+    return response()->json([
+      'courses' => CourseController::coursesToOldJson($result['courses']),
+    ]);
+  }
+
   public function getCoursesAdvancedWithOldApi(Request $request) {
     $terms = [];
     foreach([1, 2] as $term) {

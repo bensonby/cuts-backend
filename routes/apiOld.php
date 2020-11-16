@@ -20,6 +20,11 @@ Route::get(
   [CourseController::class, 'getCoursesWithOldApi']
 );
 
+Route::get(
+  'ajax_planner2_get_course_by_period.php',
+  [CourseController::class, 'getCoursesByPeriodWithOldApi']
+);
+
 Route::post(
   'app_course_search.php',
   [CourseController::class, 'getCoursesAdvancedWithOldApi']

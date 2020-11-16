@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,4 +24,13 @@ Route::get('/tos.html', function () {
 
 Route::get('/privacy-policy.html', function () {
     return view('privacy');
+});
+
+Route::get('/planner', function (Request $request) {
+  $year = intval($request->input('year'));
+  $term = intval($request->input('term'));
+  return view('planner', [
+    'year' => $year,
+    'term' => $term,
+  ]);
 });
