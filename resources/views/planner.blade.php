@@ -28,8 +28,8 @@
   <div style="position: fixed; height: 35px; top: 0; z-index: 3;">
     <ul id="menu" style="height: 35px; top: 0;">
       <span style="font-size: 18px;">
-        <a href="/planner?year=2020&term=1">2020 Term 1</a> |
-        <a href="/planner?year=2020&term=2">2020 Term 2</a>
+        <a href="/planner?year={{ $year }}&term=1">{{ $year }} Term 1</a> |
+        <a href="/planner?year={{ $year }}&term=2">{{ $year }} Term 2</a>
       </span>
     </ul>
   </div>
