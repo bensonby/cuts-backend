@@ -30,6 +30,13 @@ class Timetable extends Model
       "score",
     ];
 
+    protected $casts = [
+      'year' => 'int',
+      'term' => 'int',
+      'unit' => 'int',
+      'score' => 'int',
+    ];
+
     // TODO consider making this event to automatically update
     public function calculateUnit() {
       $this->unit = array_sum(
