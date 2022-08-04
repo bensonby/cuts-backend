@@ -14,6 +14,9 @@ set('repository', 'git@github.com:bensonby/cuts-backend.git');
 // [Optional] Allocate tty for git clone. Default value is false.
 set('git_tty', true); 
 
+// set update_code_strategy to be clone instead of archive, for git submodule support
+set('update_code_strategy', 'clone');
+
 // Shared files/dirs between deploys 
 add('shared_files', [
   '.env',
@@ -105,6 +108,15 @@ task('copy:nginx_conf', function () {
 // [Optional] if deploy fails automatically unlock.
 after('deploy:failed', 'deploy:unlock');
 
+// https://github.com/deployphp/deployer/issues/2802
+after('deploy:update_code', 'deploy:git:submodules');
+task('deploy:git:submodules', function () {
+    $git = get('bin/git');
+
+    cd('{{release_path}}');
+    run("$git submodule update --init");
+});
+
 task('reset:cache', [
   'artisan2:optimize:clear',
   'artisan2:route:clear',
@@ -114,15 +126,16 @@ task('reset:cache', [
 ]);
 task('initialize', [
     'deploy:prepare',
-    'deploy:lock',
+    // 'deploy:lock',
     'deploy:release',
     'deploy:update_code',
     'deploy:unlock',
-    'cleanup',
+    'deploy:cleanup',
 ]);
+
 task('deploy', [
     'deploy:prepare',
-    'deploy:lock',
+    // 'deploy:lock', // it calls deploy:lock automatically after shared?
     'deploy:release',
     'deploy:update_code',
     'deploy:shared',
@@ -138,5 +151,5 @@ task('deploy', [
     // 'artisan2:migrate:fresh', // first time run only
     'artisan2:migrate',
     'deploy:unlock',
-    'cleanup',
+    'deploy:cleanup',
 ]);
