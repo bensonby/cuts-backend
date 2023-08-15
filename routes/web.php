@@ -27,7 +27,7 @@ Route::get('/privacy-policy.html', function () {
 });
 
 Route::get('/planner', function (Request $request) {
-  $year = intval($request->input('year')) ?: env('CUTS_DATA_LATEST_YEAR', 2022);
+  $year = intval($request->input('year')) ?: env('CUTS_DATA_LATEST_YEAR', 2023);
   $term = intval($request->input('term')) ?: 1;
   return view('planner', [
     'year' => $year,
