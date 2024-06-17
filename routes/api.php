@@ -24,7 +24,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('meta', GetAppMeta::class);
 
-Route::middleware('jwt')->group(function () {
+Route::middleware('auth')->group(function () {
   Route::get('/private', function (Request $request) {
     return response()->json(["message" => "Hello private"]);
   });

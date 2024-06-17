@@ -3,13 +3,27 @@ namespace App\Repositories;
 
 use App\Models\User;
 
-use Auth0\Login\Auth0User;
-use Auth0\Login\Auth0JWTUser;
-use Auth0\Login\Repository\Auth0UserRepository;
+use Auth0\Laravel\{UserRepositoryAbstract, UserRepositoryContract};
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class CustomUserRepository extends Auth0UserRepository
+// https://github.com/auth0/laravel-auth0/blob/main/docs/Users.md#user-repositories
+final class CustomUserRepository extends UserRepositoryAbstract implements UserRepositoryContract
 {
+    public function fromAccessToken(array $user): ?Authenticatable
+    {
+        /*
+            $user = [ // Example of a decoded access token
+                "iss"   => "https://example.auth0.com/",
+                "aud"   => "https://api.example.com/calendar/v1/",
+                "sub"   => "auth0|123456",
+                "exp"   => 1458872196,
+                "iat"   => 1458785796,
+                "scope" => "read write",
+            ];
+        */
+
+        return $this->upsertUser($user);
+    }
 
     /**
      * Get an existing user or create a new one
@@ -25,30 +39,31 @@ class CustomUserRepository extends Auth0UserRepository
         ]);
     }
 
-    /**
-     * Authenticate a user with a decoded ID Token
-     *
-     * @param array $decodedJwt
-     *
-     * @return Auth0JWTUser
-     */
-    public function getUserByDecodedJWT(array $decodedJwt) : Authenticatable
+    public function fromSession(array $user): ?Authenticatable
     {
-        $user = $this->upsertUser( (array) $decodedJwt );
-        return new Auth0JWTUser( $user->getAttributes() );
-    }
+        /*
+            $user = [ // Example of a decoded ID token
+                "iss"         => "http://example.auth0.com",
+                "aud"         => "client_id",
+                "sub"         => "auth0|123456",
+                "exp"         => 1458872196,
+                "iat"         => 1458785796,
+                "name"        => "Jane Doe",
+                "email"       => "janedoe@example.com",
+            ];
+        */
 
-    /**
-     * Get a User from the database using Auth0 profile information
-     *
-     * @param array $userinfo
-     *
-     * @return Auth0User
-     */
-    public function getUserByUserInfo(array $userinfo) : Authenticatable
-    {
-        $user = $this->upsertUser( $userinfo['profile'] );
-        return new Auth0User( $user->getAttributes(), $userinfo['accessToken'] );
-    }
+        $user = User::updateOrCreate(
+            attributes: [
+                'auth0' => $user['sub'],
+            ],
+            values: [
+                'name' => $user['name'] ?? '',
+                'email' => $user['email'] ?? '',
+                'email_verified' => $user['email_verified'] ?? false,
+            ]
+        );
 
+        return $user;
+    }
 }

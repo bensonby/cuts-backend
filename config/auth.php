@@ -40,12 +40,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
-        'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
-            'hash' => false,
-        ],
     ],
 
     /*
@@ -66,6 +60,10 @@ return [
     */
 
     'providers' => [
+        'auth0-provider' => [
+            'driver' => 'auth0.provider',
+            'repository' => \App\Repositories\CustomUserRepository::class,
+        ],
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
