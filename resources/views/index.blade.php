@@ -12,7 +12,7 @@
   <nav class="navbar navbar-light bg-light static-top">
     <div class="container">
       <a class="navbar-brand" href="#">
-        <img class="align-middle" src="img/logo.png" style="width: 29; height: 29;" alt="CUTS logo" />
+        <img class="align-middle" src="img/logo.png" style="width: 29px; height: 29px; margin-right: 5px;" alt="CUTS logo" />
         <span class="align-middle">CUTS (CUHK Timetable System)</span>
       </a>
       </a>
