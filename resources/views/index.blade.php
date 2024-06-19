@@ -25,21 +25,37 @@
     <div class="container">
       <div class="row">
         <div class="col-xl-9 mx-auto">
-          <h1 class="mb-5">Plan, View and Organize Your CUHK Timetable with CUTS App!</h1>
+          <h1 class="mb-5">The CUHK timetable planner you need</h1>
         </div>
         <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
           <form>
             <div class="form-row">
-<!--
-              <div class="col-12 col-md-6">
-                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                  <a href='https://apps.apple.com/us/app/cuts-cuhk-timetable-system/id1498369252?mt=8' class="align-middle" style="display: inline-block;"><img alt='Get it on App Store' src='img/ios-badge.png' class="align-middle" style="width: 209px; height: 62px;"/></a>
+              @if ($link_count == 0)
+                <div class="col-12 col-md-12">
+                    <h4>(Stay tuned!)</h4>
                 </div>
-              </div>
--->
-              <div class="col-12 col-md-12">
-                <a href='https://play.google.com/store/apps/details?id=com.cuhkcuts&hl=en_US&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' style="width: 240px;"/></a>
-              </div>
+              @else
+                @if ($ios_link != null)
+                  @if ($link_count == 1)
+                    <div class="col-12">
+                  @else
+                    <div class="col-12 col-md-6">
+                  @endif
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                      <a href="{{ $ios_link }}" class="align-middle" style="display: inline-block;"><img alt="Get it on App Store" src="img/ios-badge.png" class="align-middle" style="width: 209px; height: 62px;"/></a>
+                    </div>
+                  </div>
+                @endif
+                @if ($android_link != null)
+                  @if ($link_count == 1)
+                    <div class="col-12">
+                  @else
+                    <div class="col-12 col-md-6">
+                  @endif
+                    <a href="{{ $android_link }}"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" style="width: 240px;"/></a>
+                  </div>
+                @endif
+              @endif
             </div>
           </form>
         </div>
@@ -57,7 +73,7 @@
               <i class="icon-screen-desktop m-auto text-primary"></i>
             </div>
             <h3>Intuitive Interface</h3>
-            <p class="lead mb-0">You will surely love the timetable planning experience in CUTS.</p>
+            <p class="lead mb-0">You will surely love the timetable planning experience with CUTS.</p>
           </div>
         </div>
         <div class="col-lg-4">
@@ -65,8 +81,8 @@
             <div class="features-icons-icon d-flex">
               <i class="icon-layers m-auto text-primary"></i>
             </div>
-            <h3>Versatile Scheduler</h3>
-            <p class="lead mb-0">CUTS can show your next lesson and put your schedule to your calendar.</p>
+            <h3>Course Customization</h3>
+            <p class="lead mb-0">Set the colors of your timetable, and toggle the periods as you wish.</p>
           </div>
         </div>
         <div class="col-lg-4">
@@ -74,8 +90,8 @@
             <div class="features-icons-icon d-flex">
               <i class="icon-check m-auto text-primary"></i>
             </div>
-            <h3>No annoying wait</h3>
-            <p class="lead mb-0">Free of ads and splash screen. View your timetable in 1 second.</p>
+            <h3>No Annoying Wait</h3>
+            <p class="lead mb-0">Free of ads and splash screen. CUTS shows your timetable in 1 second.</p>
           </div>
         </div>
       </div>

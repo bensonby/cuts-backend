@@ -15,7 +15,14 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    return view('index');
+    $ios = env('CUTS_IOS_DOWNLOAD_LINK', null);
+    $android = env('CUTS_ANDROID_DOWNLOAD_LINK', null);
+    $link_count = ($ios == null ? 0 : 1) + ($android == null ? 0 : 1);
+    return view('index', [
+        'ios_link' => $ios,
+        'android_link' => $android,
+        'link_count' => $link_count,
+    ]);
 });
 
 Route::get('/tos.html', function () {

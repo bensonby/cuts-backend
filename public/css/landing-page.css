@@ -23,8 +23,8 @@ header.masthead {
   background-color: #f58a07;
   background: url("/img/bg-landing-page.jpg") no-repeat center center #f58a07;
   background-size: cover;
-  padding-top: 8rem;
-  padding-bottom: 8rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 header.masthead .overlay {
@@ -43,8 +43,8 @@ header.masthead h1 {
 
 @media (min-width: 768px) {
   header.masthead {
-    padding-top: 12rem;
-    padding-bottom: 12rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
   }
   header.masthead h1 {
     font-size: 3rem;
