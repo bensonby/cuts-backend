@@ -4,7 +4,7 @@
 
 @section('head')
   <!-- Custom styles for this template -->
-  <link href="css/landing-page.min.css" rel="stylesheet">
+  <link href="/css/landing-page.css" rel="stylesheet">
 @endsection
 
 @section('content')

@@ -21,7 +21,7 @@ h6 {
 header.masthead {
   position: relative;
   background-color: #f58a07;
-  background: url("../img/bg-landing-page.jpg") no-repeat center center #f58a07;
+  background: url("/img/bg-landing-page.jpg") no-repeat center center #f58a07;
   background-size: cover;
   padding-top: 8rem;
   padding-bottom: 8rem;
@@ -67,8 +67,8 @@ header.masthead h1 {
 }
 
 .features-icons {
-  padding-top: 7rem;
-  padding-bottom: 7rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .features-icons .features-icons-item {
@@ -104,7 +104,7 @@ header.masthead h1 {
 .call-to-action {
   position: relative;
   background-color: #343a40;
-  background: url("../img/bg-masthead.jpg") no-repeat center center;
+  background: url("img/bg-masthead.jpg") no-repeat center center;
   background-size: cover;
   padding-top: 7rem;
   padding-bottom: 7rem;
