@@ -121,12 +121,12 @@ return [
     'notifications' => [
 
         'notifications' => [
-            \Spatie\Backup\Notifications\Notifications\BackupHasFailed::class => ['slack'],
-            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFound::class => ['slack'],
-            \Spatie\Backup\Notifications\Notifications\CleanupHasFailed::class => ['slack'],
-            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessful::class => ['slack'],
-            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFound::class => ['slack'],
-            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessful::class => ['slack'],
+            \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class => ['discord'],
+            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class => ['discord'],
+            \Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification::class => ['discord'],
+            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification::class => ['discord'],
+            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification::class => ['discord'],
+            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification::class => ['discord'],
         ],
 
         /*
@@ -156,6 +156,20 @@ return [
 
             'icon' => null,
 
+        ],
+
+        'discord' => [
+            'webhook_url' => env('DISCORD_WEBHOOK_URL', ''),
+
+            /*
+             * If this is an empty string, the name field on the webhook will be used.
+             */
+            'username' => '',
+
+            /*
+             * If this is an empty string, the avatar on the webhook will be used.
+             */
+            'avatar_url' => '',
         ],
     ],
 
