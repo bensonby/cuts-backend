@@ -9,12 +9,14 @@
 
 @section('content')
   <!-- Navigation -->
-  <nav class="navbar navbar-light bg-light static-top">
+  <nav class="navbar navbar-light bg-light static-top justify-content-between">
     <div class="container">
       <a class="navbar-brand" href="#">
         <img class="align-middle" src="img/logo.png" style="width: 29px; height: 29px; margin-right: 5px;" alt="CUTS logo" />
-        <span class="align-middle">CUTS (CUHK Timetable System)</span>
+        <span class="align-middle">CUTS</span>
       </a>
+      <a href="https://www.instagram.com/cuhk.cuts" style="color: rgb(33, 37, 41)">
+        <i class="fab fa-instagram fa-2x fa-fw"></i>
       </a>
     </div>
   </nav>
@@ -25,7 +27,7 @@
     <div class="container">
       <div class="row">
         <div class="col-xl-9 mx-auto">
-          <h1 class="mb-5">The CUHK timetable planner you need</h1>
+          <h1 class="mb-5">Your CUHK timetable planner</h1>
         </div>
         <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
           <form>
@@ -102,7 +104,7 @@
   <footer class="footer bg-light">
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+        <div class="col-lg-12 h-100 text-center text-lg-left my-auto">
           <ul class="list-inline mb-2">
             <li class="list-inline-item">
               <a href="https://www.facebook.com/cuhk.cuts">Contact</a>
@@ -117,15 +119,6 @@
             </li>
           </ul>
           <p class="text-muted small mb-4 mb-lg-0">&copy; CUTS 2020. All Rights Reserved.</p>
-        </div>
-        <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item mr-3">
-              <a href="https://www.facebook.com/cuhk.cuts" style="color: #4267b2;">
-                <i class="fab fa-facebook fa-2x fa-fw"></i>
-              </a>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
