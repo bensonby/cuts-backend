@@ -34,6 +34,8 @@ Using Laravel Sail
 # ./vendor/bin/sail build --no-cache
 ./vendor/bin/sail artisan migrate
 ./vendor/bin/sail mysql < path_to_db_dump.sql
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run dev
 ```
 
 ## Database Migration

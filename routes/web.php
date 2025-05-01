@@ -33,8 +33,17 @@ Route::get('/privacy-policy.html', function () {
     return view('privacy');
 });
 
-Route::get('/planner', function (Request $request) {
+Route::get('/planner_old', function (Request $request) {
   $year = intval($request->input('year')) ?: env('CUTS_DATA_LATEST_YEAR', 2023);
+  $term = intval($request->input('term')) ?: 1;
+  return view('planner_old', [
+    'year' => $year,
+    'term' => $term,
+  ]);
+});
+
+Route::get('/planner', function (Request $request) {
+  $year = intval($request->input('year')) ?: env('CUTS_DATA_LATEST_YEAR', 2024);
   $term = intval($request->input('term')) ?: 1;
   return view('planner', [
     'year' => $year,
