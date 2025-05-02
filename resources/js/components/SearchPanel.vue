@@ -5,8 +5,8 @@ const axios = inject('axios');
 
 const coursecodes = ref({});
 const subjects = ref([]);
+const selectedLetter = ref('');
 const showSubjects = ref(false);
-const subjectStyles = ref({});
 
 onMounted(() => {
   axios.get('/api/coursecodes/2024/1').then(response => {
@@ -15,52 +15,51 @@ onMounted(() => {
 });
 
 const hideSubjects = () => {
-  showSubjects.value = false;
+  showSubjects.value = null;
+  selectedLetter.value = '';
 };
 
 const selectLetter = (letter) => {
   const firstLetters = Object.entries(coursecodes.value).map(x => x[0]);
   const index = firstLetters.indexOf(letter);
   subjects.value = coursecodes.value[letter];
-  subjectStyles.value = {
-    top: index == 0 ? 0 : (index == firstLetters.length - 1 ? null : ((index / firstLetters.length) * 100 - 3) + '%'),
-    bottom: index == firstLetters.length - 1 ? 0 : null,
-  };
+  const subjectLength = Object.keys(subjects.value).length;
   showSubjects.value = true;
+  selectedLetter.value = letter;
 };
 
 const search = (key) => {
-  showSubjects.value = false;
+  hideSubjects();
   props.searchSubject(key);
 };
 
 </script>
 <template>
   <div/>
-  <div
-    id="subjects"
-    v-if="showSubjects"
-    @mouseleave="hideSubjects()"
-    class="absolute left-1/20 w-100 bg-blue-500 min-h-1/10 align-middle px-2"
-    :style="subjectStyles"
-  >
-    <button
-      class="bg-blue-500 hover:bg-blue-700 text-white py-2 w-1/7 text-sm"
-      v-for="(_, key) in subjects"
-      :key="key"
-      @click="search(key)">
-      {{ key }}
-    </button>
-  </div>
   <div id="search-panel" class="bg-orange-500 h-full fixed w-1/20">
-    <div id="first-letter" class="relative flex flex-col h-full">
-      <button
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 flex-1 grow"
-        v-for="(_, key) in coursecodes"
-        :key="key"
-        @mouseover="selectLetter(key)">
-        {{ key }}
-      </button>
+    <div id="first-letter" class="relative h-full">
+      <div class="relative" v-for="(_, letter) in coursecodes">
+        <button
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 h-1/26 w-full"
+          :key="letter"
+          @mouseover="selectLetter(letter)">
+          {{ letter }}
+        </button>
+        <div
+          id="subjects"
+          v-if="selectedLetter == letter"
+          @mouseleave="hideSubjects()"
+          class="absolute left-full bg-blue-500 top-0 w-60"
+        >
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 text-sm w-20"
+            v-for="(__, key) in subjects"
+            :key="key"
+            @click="search(key)">
+            {{ key }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
