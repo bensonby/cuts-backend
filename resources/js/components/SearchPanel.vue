@@ -36,8 +36,8 @@ const search = (key) => {
 </script>
 <template>
   <div/>
-  <div id="search-panel" class="bg-orange-500 h-full fixed w-1/20">
-    <div id="first-letter" class="relative h-full">
+  <div id="search-panel" class="bg-orange-500 fixed w-1/20">
+    <div id="first-letter" class="relative">
       <div class="relative" v-for="(_, letter) in coursecodes">
         <button
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 h-1/26 w-full"

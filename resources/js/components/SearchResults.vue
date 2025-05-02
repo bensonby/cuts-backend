@@ -1,9 +1,10 @@
 <script setup>
-defineProps(['courses'])
+const props = defineProps(['courses', 'highlightCourse'])
 import CourseRow from './CourseRow.vue';
 </script>
 <template>
-  <table id="search-results" class="w-1/1 max-w-1/1 table-auto text-xs m-3">
+<div class="h-dvh overflow-y-scroll overflow-x-hidden box-border">
+  <table id="search-results" class="w-1/1 max-w-1/1 table-auto text-xs">
     <thead>
       <tr>
         <th class="p-1 text-left">Code</th>
@@ -16,7 +17,9 @@ import CourseRow from './CourseRow.vue';
         v-for="course in courses"
         :key="course.id"
         :course="course"
+        :highlightCourse="highlightCourse"
       />
     </tbody>
   </table>
+</div>
 </template>
