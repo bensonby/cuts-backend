@@ -1,8 +1,16 @@
 <script setup>
-const props = defineProps(['highlightedPeriods'])
+const props = defineProps(['userCourses', 'highlightedPeriods'])
+const summary = () => ({
+  count: props.userCourses.length,
+  units: props.userCourses.reduce((total, uc) => total + uc.course.unit, 0),
+});
+/* TODO: use correct way */
 </script>
 <template>
 <div class="h-dvh w-full box-border relative">
+  <div>
+    2024-25 Term 1, {{ summary().count }} courses, {{ summary().units }} units
+  </div>
   <div class="w-full flex table border-collapse">
     <div class="table-row">
       <div
@@ -19,7 +27,7 @@ const props = defineProps(['highlightedPeriods'])
       <div
         v-for="day in ['M', 'T', 'W', 'H', 'F', 'S']"
         class="table-cell border border-gray-400 border-dashed w-15/100"
-        :class="{ 'border-orange-500 border-solid border-w-2': props.highlightedPeriods.includes(`${day}${period}`) }">
+        :style="props.highlightedPeriods.includes(`${day}${period}`) ? { /* 'border': '2px outset gray' */ 'box-shadow': '0 0 3px 3px orange' } : {}">
       </div>
     </div>
   </div>

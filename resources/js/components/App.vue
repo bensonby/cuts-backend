@@ -6,6 +6,7 @@ import TimetableGrid from './TimetableGrid.vue';
 const axios = inject('axios');
 const courses = ref([]);
 const highlightedPeriods = ref([]);
+const userCourses = ref([]);
 
 const searchSubject = (subject) => {
   axios.get(`/api/courses/2024/1/${subject}`).then(response => {
@@ -14,6 +15,10 @@ const searchSubject = (subject) => {
 };
 
 const highlightCourse = (course) => {
+  if (!course) {
+    highlightedPeriods.value = [];
+    return ;
+  }
   const periods = [];
   for (const period of course.periods) {
     if (period.day == 'Z') {
@@ -25,6 +30,13 @@ const highlightCourse = (course) => {
   }
   highlightedPeriods.value = periods;
 };
+
+const addCourse = (course) => {
+  userCourses.value = [
+    ...userCourses.value,
+    { course: course },
+  ];
+};
 </script>
  
 <template>
@@ -33,7 +45,12 @@ const highlightCourse = (course) => {
     <SearchResults
       :courses="courses"
       :highlightCourse="highlightCourse"
+      :addCourse="addCourse"
+      :userCourses="userCourses"
     />
-    <TimetableGrid :highlightedPeriods="highlightedPeriods" />
+    <TimetableGrid
+      :userCourses="userCourses"
+      :highlightedPeriods="highlightedPeriods"
+    />
   </div>
 </template>

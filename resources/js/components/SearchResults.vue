@@ -1,5 +1,10 @@
 <script setup>
-const props = defineProps(['courses', 'highlightCourse'])
+const props = defineProps([
+  'courses',
+  'highlightCourse',
+  'addCourse',
+  'userCourses',
+])
 import CourseRow from './CourseRow.vue';
 </script>
 <template>
@@ -12,12 +17,14 @@ import CourseRow from './CourseRow.vue';
         <th class="p-1">Unit</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody @mouseleave="highlightCourse(null)">
       <CourseRow
         v-for="course in courses"
         :key="course.id"
         :course="course"
         :highlightCourse="highlightCourse"
+        :addCourse="addCourse"
+        :added="userCourses.map(uc => uc.course.id).includes(course.id)"
       />
     </tbody>
   </table>

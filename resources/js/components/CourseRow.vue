@@ -1,12 +1,25 @@
 <script setup>
 import { toRaw } from 'vue';
-const props = defineProps(['course', 'highlightCourse'])
+const props = defineProps([
+  'course',
+  'highlightCourse',
+  'addCourse',
+  'added',
+])
 const handleMouseover = () => {
   props.highlightCourse(toRaw(props.course));
 };
+const handleClick = () => {
+  props.addCourse(toRaw(props.course));
+};
 </script>
 <template>
-  <tr class="border-b border-gray-400" @mouseover="handleMouseover()">
+  <tr
+    class="border-b border-gray-400 hover:bg-gray-200"
+    :class="{ 'bg-orange-300': added }"
+    @mouseover="handleMouseover()"
+    @click="handleClick()"
+  >
     <td class="p-1 align-top w-25">{{ course.coursecode }}</td>
     <td class="p-1 align-top">{{ course.coursename }}</td>
     <td class="p-1 text-center align-top w-9">{{ course.unit }}</td>
