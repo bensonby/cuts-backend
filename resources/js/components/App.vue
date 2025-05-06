@@ -3,6 +3,7 @@ import { inject, ref } from 'vue';
 import SearchPanel from './SearchPanel.vue';
 import SearchResults from './SearchResults.vue';
 import TimetableGrid from './TimetableGrid.vue';
+import * as ColorUtils from '../util/color';
 const axios = inject('axios');
 const courses = ref([]);
 const highlightedPeriods = ref([]);
@@ -32,10 +33,17 @@ const highlightCourse = (course) => {
 };
 
 const addCourse = (course) => {
+  const color = ColorUtils.randomColor(userCourses.value, course);
   userCourses.value = [
     ...userCourses.value,
-    { course: course },
+    {
+      color: color,
+      course: course,
+    },
   ];
+};
+const removeCourse = (course) => {
+  userCourses.value = userCourses.value.filter(uc => uc.course.id != course.id);
 };
 </script>
  
@@ -46,6 +54,7 @@ const addCourse = (course) => {
       :courses="courses"
       :highlightCourse="highlightCourse"
       :addCourse="addCourse"
+      :removeCourse="removeCourse"
       :userCourses="userCourses"
     />
     <TimetableGrid

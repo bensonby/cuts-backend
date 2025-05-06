@@ -4,13 +4,18 @@ const props = defineProps([
   'course',
   'highlightCourse',
   'addCourse',
+  'removeCourse',
   'added',
 ])
 const handleMouseover = () => {
   props.highlightCourse(toRaw(props.course));
 };
 const handleClick = () => {
-  props.addCourse(toRaw(props.course));
+  if (props.added) {
+    props.removeCourse(toRaw(props.course));
+  } else {
+    props.addCourse(toRaw(props.course));
+  }
 };
 </script>
 <template>

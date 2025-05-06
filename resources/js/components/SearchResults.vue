@@ -3,6 +3,7 @@ const props = defineProps([
   'courses',
   'highlightCourse',
   'addCourse',
+  'removeCourse',
   'userCourses',
 ])
 import CourseRow from './CourseRow.vue';
@@ -24,6 +25,7 @@ import CourseRow from './CourseRow.vue';
         :course="course"
         :highlightCourse="highlightCourse"
         :addCourse="addCourse"
+        :removeCourse="removeCourse"
         :added="userCourses.map(uc => uc.course.id).includes(course.id)"
       />
     </tbody>
