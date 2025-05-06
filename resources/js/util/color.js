@@ -15,7 +15,7 @@ export const fgFromBg = (bgHex) => {
   return value < 500 ? 'FFFFFF' : '000000';
 };
 
-function hslToRgb(h, s, l) {
+export const hslToRgb = (h, s, l) => {
   var r, g, b;
 
   if (s == 0) {
@@ -43,9 +43,9 @@ function hslToRgb(h, s, l) {
     Math.round(g * 255),
     Math.round(b * 255),
   ];
-}
+};
 
-const arrayToRgb = (colors) => {
+export const arrayToRgb = (colors) => {
   return (colors[0] * 256 * 256 + colors[1] * 256 + colors[2]).toString(16).padStart(6, '0');
 };
 
@@ -61,7 +61,7 @@ const rgbToArray = (color) => {
   ];
 };
 
-const rgbToHsl = (color) => {
+export const rgbToHsl = (color) => {
   const r = parseInt(color.substr(0, 2), 16)/255;
   const g = parseInt(color.substr(2, 2), 16)/255;
   const b = parseInt(color.substr(4, 2), 16)/255;

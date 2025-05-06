@@ -39,11 +39,31 @@ const addCourse = (course) => {
     {
       color: color,
       course: course,
+      userPeriods: course.periods.map(p => ({
+        period: p,
+        necessity: true,
+      })),
     },
   ];
 };
 const removeCourse = (course) => {
   userCourses.value = userCourses.value.filter(uc => uc.course.id != course.id);
+};
+
+const editPeriodNecessity = (courseId, periodId, necessity) => {
+  userCourses.value = userCourses.value.map((uc) => {
+    if (uc.course.id != courseId) return uc;
+    return {
+      ...uc,
+      userPeriods: uc.userPeriods.map((up) => {
+        if (up.period.id != periodId) return up;
+        return {
+          ...up,
+          necessity,
+        };
+      }),
+    };
+  });
 };
 </script>
  
@@ -60,6 +80,7 @@ const removeCourse = (course) => {
     <TimetableGrid
       :userCourses="userCourses"
       :highlightedPeriods="highlightedPeriods"
+      :editPeriodNecessity="editPeriodNecessity"
     />
   </div>
 </template>
