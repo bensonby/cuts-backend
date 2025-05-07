@@ -68,7 +68,7 @@ const editPeriodNecessity = (courseId, periodId, necessity) => {
 </script>
  
 <template>
-  <div class="grid grid-cols-[5%_30%_60%] h-dvh items-start">
+  <div class="grid grid-cols-[5%_35%_55%] h-dvh items-start">
     <SearchPanel :searchSubject="searchSubject" />
     <SearchResults
       :courses="courses"

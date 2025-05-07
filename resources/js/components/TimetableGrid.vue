@@ -94,8 +94,9 @@ const handleMouseleavePeriod = () => {
               }"
             >
               <p class="text-sm">{{ uc.course.coursecode }}</p>
-              <p class="text-xs">{{ uc.course.coursename }}</p>
-              <p class="mb-2">{{ uc.course.coursenamec }}</p>
+              <p>{{ uc.course.coursename }}</p>
+              <p>{{ uc.course.coursenamec }}</p>
+              <p class="mb-2 whitespace-pre">{{ uc.course.professors.map(p => p.name).join('\n') }}</p>
               <div class="max-h-50 overflow-y-auto">
                 <div v-for="up in uc.userPeriods" class="my-1">
                   <input
@@ -113,7 +114,6 @@ const handleMouseleavePeriod = () => {
                   </p>
                 </div>
               </div>
-              <p class="mt-2 whitespace-pre">{{ uc.course.professors.map(p => p.name).join('\n') }}</p>
             </div>
           </div>
         </template>
